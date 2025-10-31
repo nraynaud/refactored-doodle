@@ -1,5 +1,8 @@
 import restructured from 'restructured'
 import { crc16Le } from './crc.mjs'
+// everything about Network Co Processor, parsing of the .rst doc, frame generation and parsing.
+
+
 
 function createTitlePredicate (predicate) {
   return (el) => el.children && el.children[0].type === 'title' && predicate(el.children[0].children[0].value.trim())

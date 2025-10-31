@@ -29,7 +29,7 @@ for (const op of Object.values(documentedOperations)) {
     }
   }
 }
-console.log('all type: ', allTypes)
+console.log('all types: ', allTypes)
 
 const uart = new SerialPort({path: SERIAL, baudRate: 115200})
 const encoder = new SlipEncoder({START: 0xc0})

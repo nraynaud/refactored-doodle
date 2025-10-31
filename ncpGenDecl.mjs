@@ -1,5 +1,7 @@
 import { TYPE_TEXT } from './ncpParsing.mjs'
 
+// generate the Typescript declaration file from the parsed operations
+
 export function generateAPIFile (documentedOperations) {
   const allTypes = new Set()
   for (const op of Object.values(documentedOperations)) {
