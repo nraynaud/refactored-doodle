@@ -29,9 +29,10 @@ function generateBaseTypes (types) {
 function generateClass (operation) {
   const opTypes = TYPE_TEXT.filter(t => t in operation && operation[t])
   const functions = opTypes.map(type => generateOpType(operation, type))
-
+  const generatedHash = operation.name.toLowerCase().replaceAll('_', '-')
   return [`
-/** ${operation.description} **/
+/** ${operation.description}
+    @see {@link https://docs.espressif.com/projects/esp-zigbee-sdk/en/latest/esp32/user-guide/ncp.html#${generatedHash}| Online doc} **/
 export class ${operation.name} {
 `, functions, `}
 `]
