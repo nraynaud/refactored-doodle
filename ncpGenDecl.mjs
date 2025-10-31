@@ -31,9 +31,7 @@ function generateClass (operation) {
   const functions = opTypes.map(type => generateOpType(operation, type))
 
   return [`
-/**
-  ${operation.description}
-**/
+/** ${operation.description} **/
 export class ${operation.name} {
 `, functions, `}
 `]
@@ -42,8 +40,7 @@ export class ${operation.name} {
 function generateOpType (operation, type) {
   const params = operation[type].map(p => `${p[0]}: ${p[1]}`)
   const paramDocs = operation[type].map(p => `    * @param ${p[0]} ${p[2]}`)
-  const opDoc = `
-    /**
+  const opDoc = `    /**
 ${paramDocs.join('\n')}
     **/
 `

@@ -10,12 +10,9 @@ export type uint8_t_v16 = { readonly [tag]: 'uint8_t_v16' };
 export type uint16_t_vec = { readonly [tag]: 'uint16_t_vec' };
 export type uint8_t_vec = { readonly [tag]: 'uint8_t_vec' };
 
-/**
-  Resume network operation after a reboot
-**/
+/** Resume network operation after a reboot **/
 export class NETWORK_INIT {
     REQUEST(): void;
-
     /**
     * @param status Status value indicating success or the reason for failure
     **/
@@ -23,16 +20,12 @@ export class NETWORK_INIT {
     NOTIFY(): void;
 }
 
-/**
-  Start the commissioning process
-**/
+/** Start the commissioning process **/
 export class NETWORK_START {
-
     /**
     * @param autostart Autostart or no-autostart
     **/
     REQUEST(autostart: bool): void;
-
     /**
     * @param status Status value indicating success or the reason for failure
     **/
@@ -40,12 +33,9 @@ export class NETWORK_START {
     NOTIFY(): void;
 }
 
-/**
-  Returns a value indicating whether the node is joining, joined to, or leaving a network
-**/
+/** Returns a value indicating whether the node is joining, joined to, or leaving a network **/
 export class NETWORK_STATE {
     REQUEST(): void;
-
     /**
     * @param network_state A value indicating whether the node is joining, joined t , or leaving a network
     **/
@@ -53,28 +43,21 @@ export class NETWORK_STATE {
     NOTIFY(): void;
 }
 
-/**
-  Notify it when the status of the stack changes
-**/
+/** Notify it when the status of the stack changes **/
 export class NETWORK_STACK_STATUS_HANDLER {
     REQUEST(): void;
-
     /**
     * @param stack_status The status of the stack changes
     **/
     RESPONSE(stack_status: uint8_t): void;
-
     /**
     * @param stack_status The status of the stack changes
     **/
     NOTIFY(stack_status: uint8_t): void;
 }
 
-/**
-  Forms a new network by becoming the coordinator
-**/
+/** Forms a new network by becoming the coordinator **/
 export class NETWORK_FORM {
-
     /**
     * @param role The role of device in zigbee network
     * @param max_children_or_ed_timeout Max number of the children when coordinator or router, timeout when end device
@@ -82,12 +65,10 @@ export class NETWORK_FORM {
     * @param keep_alive Keep alive timeout in milliseconds when end device
     **/
     REQUEST(role: uint8_t, max_children_or_ed_timeout: uint8_t, install_code_policy: bool, keep_alive: uint32_t): void;
-
     /**
     * @param status Status value indicating success or the reason for failure
     **/
     RESPONSE(status: esp_ncp_status_t): void;
-
     /**
     * @param extended_panid The IEEE address for the source
     * @param panid PAN id
@@ -96,32 +77,24 @@ export class NETWORK_FORM {
     NOTIFY(extended_panid: uint8_t_v8, panid: uint8_t, channel: uint8_t): void;
 }
 
-/**
-  Allow other nodes to join the network with this node as their parent
-**/
+/** Allow other nodes to join the network with this node as their parent **/
 export class NETWORK_PERMIT_JOINING {
-
     /**
     * @param duration A value of 0x00 disables joining. A value of 0xFF enables joining. Other value enables joining for that number of seconds
     **/
     REQUEST(duration: uint8_t): void;
-
     /**
     * @param status Status value indicating success or the reason for failure
     **/
     RESPONSE(status: esp_ncp_status_t): void;
-
     /**
     * @param duration A value of 0x00 disables joining. A value of 0xFF enables joining. Other value enables joining for that number of seconds
     **/
     NOTIFY(duration: uint8_t): void;
 }
 
-/**
-  Associate with the network using the specified network parameters
-**/
+/** Associate with the network using the specified network parameters **/
 export class NETWORK_JOIN {
-
     /**
     * @param role The role of device in zigbee network
     * @param install_code_policy Allow install code security policy or not
@@ -129,12 +102,10 @@ export class NETWORK_JOIN {
     * @param keep_alive Keep alive timeout in milliseconds when end device
     **/
     REQUEST(role: uint8_t, install_code_policy: bool, max_children_or_ed_timeout: uint8_t, keep_alive: uint32_t): void;
-
     /**
     * @param status Status value indicating success or the reason for failure
     **/
     RESPONSE(status: esp_ncp_status_t): void;
-
     /**
     * @param short_addr Short address of device requested to join device
     * @param ieee_addr Long address of device requested to join  device
@@ -143,17 +114,13 @@ export class NETWORK_JOIN {
     NOTIFY(short_addr: uint16_t, ieee_addr: uint8_t_v8, capability: uint16_t): void;
 }
 
-/**
-  Causes the stack to leave the current network
-**/
+/** Causes the stack to leave the current network **/
 export class NETWORK_LEAVE {
     REQUEST(): void;
-
     /**
     * @param status Status value indicating success or the reason for failure
     **/
     RESPONSE(status: esp_ncp_status_t): void;
-
     /**
     * @param short_addr Short address of device requested to leave device
     * @param device_addr Long address of device requested to leave device
@@ -162,17 +129,13 @@ export class NETWORK_LEAVE {
     NOTIFY(short_addr: uint16_t, device_addr: uint8_t_v8, rejoin: uint16_t): void;
 }
 
-/**
-  Active scan available network
-**/
+/** Active scan available network **/
 export class NETWORK_START_SCAN {
-
     /**
     * @param channel_mask Bits set as 1 indicate that the channel should be scanne
     * @param scan_duration Time to spend scanning each channel
     **/
     REQUEST(channel_mask: uint32_t, scan_duration: uint8_t): void;
-
     /**
     * @param status Status value indicating success or the reason for failure
     **/
@@ -180,17 +143,13 @@ export class NETWORK_START_SCAN {
     NOTIFY(): void;
 }
 
-/**
-  Signals that the scan has completed
-**/
+/** Signals that the scan has completed **/
 export class NETWORK_SCAN_COMPLETE_HANDLER {
     REQUEST(): void;
-
     /**
     * @param status Status value indicating success or the reason for failure
     **/
     RESPONSE(status: esp_ncp_status_t): void;
-
     /**
     * @param status The ZDO response status
     * @param count Number of discovered networks
@@ -201,12 +160,9 @@ export class NETWORK_SCAN_COMPLETE_HANDLER {
     NOTIFY(status: uint8_t, count: uint8_t, short_pan_id: uint16_t, permit_joining: bool, extended_panid: uint8_t_v8): void;
 }
 
-/**
-  Terminates a scan in progress
-**/
+/** Terminates a scan in progress **/
 export class NETWORK_STOP_SCAN {
     REQUEST(): void;
-
     /**
     * @param status Status value indicating success or the reason for failure
     **/
@@ -214,12 +170,9 @@ export class NETWORK_STOP_SCAN {
     NOTIFY(): void;
 }
 
-/**
-  Get the Zigbee network PAN ID
-**/
+/** Get the Zigbee network PAN ID **/
 export class NETWORK_PAN_ID_GET {
     REQUEST(): void;
-
     /**
     * @param panid 16-bit Zigbee network PAN ID
     **/
@@ -227,16 +180,12 @@ export class NETWORK_PAN_ID_GET {
     NOTIFY(): void;
 }
 
-/**
-  Set the Zigbee network PAN ID
-**/
+/** Set the Zigbee network PAN ID **/
 export class NETWORK_PAN_ID_SET {
-
     /**
     * @param panid 16-bit Zigbee network PAN ID
     **/
     REQUEST(panid: uint16_t): void;
-
     /**
     * @param status Status value indicating success or the reason for failure
     **/
@@ -244,12 +193,9 @@ export class NETWORK_PAN_ID_SET {
     NOTIFY(): void;
 }
 
-/**
-  Get the Zigbee network extended PAN ID
-**/
+/** Get the Zigbee network extended PAN ID **/
 export class NETWORK_EXTENDED_PAN_ID_GET {
     REQUEST(): void;
-
     /**
     * @param extpanid An 64-bit of extended PAN ID
     **/
@@ -257,16 +203,12 @@ export class NETWORK_EXTENDED_PAN_ID_GET {
     NOTIFY(): void;
 }
 
-/**
-  Set the Zigbee network extended PAN ID
-**/
+/** Set the Zigbee network extended PAN ID **/
 export class NETWORK_EXTENDED_PAN_ID_SET {
-
     /**
     * @param extpanid An 64-bit of extended PAN ID
     **/
     REQUEST(extpanid: uint8_t_v8): void;
-
     /**
     * @param status Status value indicating success or the reason for failure
     **/
@@ -274,12 +216,9 @@ export class NETWORK_EXTENDED_PAN_ID_SET {
     NOTIFY(): void;
 }
 
-/**
-  Get the primary channel mask
-**/
+/** Get the primary channel mask **/
 export class NETWORK_PRIMARY_CHANNEL_GET {
     REQUEST(): void;
-
     /**
     * @param channel_mask The primary channel mask
     **/
@@ -287,16 +226,12 @@ export class NETWORK_PRIMARY_CHANNEL_GET {
     NOTIFY(): void;
 }
 
-/**
-  Set the primary channel mask
-**/
+/** Set the primary channel mask **/
 export class NETWORK_PRIMARY_CHANNEL_SET {
-
     /**
     * @param channelmask Valid channel mask
     **/
     REQUEST(channelmask: uint32_t): void;
-
     /**
     * @param status Status value indicating success or the reason for failure
     **/
@@ -304,16 +239,12 @@ export class NETWORK_PRIMARY_CHANNEL_SET {
     NOTIFY(): void;
 }
 
-/**
-  Set the secondary channel mask
-**/
+/** Set the secondary channel mask **/
 export class NETWORK_SECONDARY_CHANNEL_SET {
-
     /**
     * @param channelmask Valid channel mask
     **/
     REQUEST(channelmask: uint32_t): void;
-
     /**
     * @param status Status value indicating success or the reason for failure
     **/
@@ -321,12 +252,9 @@ export class NETWORK_SECONDARY_CHANNEL_SET {
     NOTIFY(): void;
 }
 
-/**
-  Get the 2.4G channel
-**/
+/** Get the 2.4G channel **/
 export class NETWORK_CHANNEL_GET {
     REQUEST(): void;
-
     /**
     * @param channel The Zigbee device current channel
     **/
@@ -334,16 +262,12 @@ export class NETWORK_CHANNEL_GET {
     NOTIFY(): void;
 }
 
-/**
-  Set the 2.4G channel mask
-**/
+/** Set the 2.4G channel mask **/
 export class NETWORK_CHANNEL_SET {
-
     /**
     * @param channelmask Valid channel mask
     **/
     REQUEST(channelmask: uint32_t): void;
-
     /**
     * @param status Status value indicating success or the reason for failure
     **/
@@ -351,16 +275,12 @@ export class NETWORK_CHANNEL_SET {
     NOTIFY(): void;
 }
 
-/**
-  Set the tx power
-**/
+/** Set the tx power **/
 export class NETWORK_TXPOWER_SET {
-
     /**
     * @param power 8-bit of power value in dB
     **/
     REQUEST(power: uint8_t): void;
-
     /**
     * @param status Status value indicating success or the reason for failure
     **/
@@ -368,12 +288,9 @@ export class NETWORK_TXPOWER_SET {
     NOTIFY(): void;
 }
 
-/**
-  Get the primary security network key
-**/
+/** Get the primary security network key **/
 export class NETWORK_PRIMARY_KEY_GET {
     REQUEST(): void;
-
     /**
     * @param network_key The primary security network key
     **/
@@ -381,16 +298,12 @@ export class NETWORK_PRIMARY_KEY_GET {
     NOTIFY(): void;
 }
 
-/**
-  Set the primary security network key
-**/
+/** Set the primary security network key **/
 export class NETWORK_PRIMARY_KEY_SET {
-
     /**
     * @param network_key The primary security network key
     **/
     REQUEST(network_key: uint8_t_v16): void;
-
     /**
     * @param status Status value indicating success or the reason for failure
     **/
@@ -398,12 +311,9 @@ export class NETWORK_PRIMARY_KEY_SET {
     NOTIFY(): void;
 }
 
-/**
-  Get the network frame counter
-**/
+/** Get the network frame counter **/
 export class NETWORK_FRAME_COUNT_GET {
     REQUEST(): void;
-
     /**
     * @param frame_counter The network frame counter
     **/
@@ -411,16 +321,12 @@ export class NETWORK_FRAME_COUNT_GET {
     NOTIFY(): void;
 }
 
-/**
-  Set the network frame counter
-**/
+/** Set the network frame counter **/
 export class NETWORK_FRAME_COUNT_SET {
-
     /**
     * @param frame_counter The network frame counter
     **/
     REQUEST(frame_counter: uint32_t): void;
-
     /**
     * @param status Status value indicating success or the reason for failure
     **/
@@ -428,12 +334,9 @@ export class NETWORK_FRAME_COUNT_SET {
     NOTIFY(): void;
 }
 
-/**
-  Get the network role 0: Coordinator, 1: Router
-**/
+/** Get the network role 0: Coordinator, 1: Router **/
 export class NETWORK_ROLE_GET {
     REQUEST(): void;
-
     /**
     * @param role The network role
     **/
@@ -441,16 +344,12 @@ export class NETWORK_ROLE_GET {
     NOTIFY(): void;
 }
 
-/**
-  Set the network role 0: Coordinator, 1: Router
-**/
+/** Set the network role 0: Coordinator, 1: Router **/
 export class NETWORK_ROLE_SET {
-
     /**
     * @param role The network role
     **/
     REQUEST(role: uint8_t): void;
-
     /**
     * @param status Status value indicating success or the reason for failure
     **/
@@ -458,12 +357,9 @@ export class NETWORK_ROLE_SET {
     NOTIFY(): void;
 }
 
-/**
-  Get the Zigbee device short address
-**/
+/** Get the Zigbee device short address **/
 export class NETWORK_SHORT_ADDRESS_GET {
     REQUEST(): void;
-
     /**
     * @param short_addr The Zigbee device short address
     **/
@@ -471,16 +367,12 @@ export class NETWORK_SHORT_ADDRESS_GET {
     NOTIFY(): void;
 }
 
-/**
-  Set the Zigbee device short address
-**/
+/** Set the Zigbee device short address **/
 export class NETWORK_SHORT_ADDRESS_SET {
-
     /**
     * @param short_addr The Zigbee device short address
     **/
     REQUEST(short_addr: uint16_t): void;
-
     /**
     * @param status Status value indicating success or the reason for failure
     **/
@@ -488,12 +380,9 @@ export class NETWORK_SHORT_ADDRESS_SET {
     NOTIFY(): void;
 }
 
-/**
-  Get the Zigbee device long address
-**/
+/** Get the Zigbee device long address **/
 export class NETWORK_LONG_ADDRESS_GET {
     REQUEST(): void;
-
     /**
     * @param long_addr The Zigbee device long address
     **/
@@ -501,16 +390,12 @@ export class NETWORK_LONG_ADDRESS_GET {
     NOTIFY(): void;
 }
 
-/**
-  Set the Zigbee device long address
-**/
+/** Set the Zigbee device long address **/
 export class NETWORK_LONG_ADDRESS_SET {
-
     /**
     * @param long_addr The Zigbee device long address
     **/
     REQUEST(long_addr: uint8_t_v8): void;
-
     /**
     * @param status Status value indicating success or the reason for failure
     **/
@@ -518,12 +403,9 @@ export class NETWORK_LONG_ADDRESS_SET {
     NOTIFY(): void;
 }
 
-/**
-  Get the channel masks
-**/
+/** Get the channel masks **/
 export class NETWORK_CHANNEL_MASKS_GET {
     REQUEST(): void;
-
     /**
     * @param role The Zigbee device the 2.4G channel mask
     **/
@@ -531,16 +413,12 @@ export class NETWORK_CHANNEL_MASKS_GET {
     NOTIFY(): void;
 }
 
-/**
-  Set the channel masks
-**/
+/** Set the channel masks **/
 export class NETWORK_CHANNEL_MASKS_SET {
-
     /**
     * @param channel_mask The Zigbee device the 2.4G channel mask
     **/
     REQUEST(channel_mask: uint32_t): void;
-
     /**
     * @param status Status value indicating success or the reason for failure
     **/
@@ -548,12 +426,9 @@ export class NETWORK_CHANNEL_MASKS_SET {
     NOTIFY(): void;
 }
 
-/**
-  Get the network update ID
-**/
+/** Get the network update ID **/
 export class NETWORK_UPDATE_ID_GET {
     REQUEST(): void;
-
     /**
     * @param nwk_update_id The network update ID
     **/
@@ -561,16 +436,12 @@ export class NETWORK_UPDATE_ID_GET {
     NOTIFY(): void;
 }
 
-/**
-  Set the network update ID
-**/
+/** Set the network update ID **/
 export class NETWORK_UPDATE_ID_SET {
-
     /**
     * @param nwk_update_id The network update ID
     **/
     REQUEST(nwk_update_id: uint8_t): void;
-
     /**
     * @param status Status value indicating success or the reason for failure
     **/
@@ -578,12 +449,9 @@ export class NETWORK_UPDATE_ID_SET {
     NOTIFY(): void;
 }
 
-/**
-  Get the network trust center address
-**/
+/** Get the network trust center address **/
 export class NETWORK_TRUST_CENTER_ADDR_GET {
     REQUEST(): void;
-
     /**
     * @param nwk_update_id The network trust center address
     **/
@@ -591,16 +459,12 @@ export class NETWORK_TRUST_CENTER_ADDR_GET {
     NOTIFY(): void;
 }
 
-/**
-  Set the network trust center address
-**/
+/** Set the network trust center address **/
 export class NETWORK_TRUST_CENTER_ADDR_SET {
-
     /**
     * @param nwk_update_id The network trust center address
     **/
     REQUEST(nwk_update_id: uint8_t): void;
-
     /**
     * @param status Status value indicating success or the reason for failure
     **/
@@ -608,12 +472,9 @@ export class NETWORK_TRUST_CENTER_ADDR_SET {
     NOTIFY(): void;
 }
 
-/**
-  Get the network link key
-**/
+/** Get the network link key **/
 export class NETWORK_LINK_KEY_GET {
     REQUEST(): void;
-
     /**
     * @param link_key The network link key
     **/
@@ -621,16 +482,12 @@ export class NETWORK_LINK_KEY_GET {
     NOTIFY(): void;
 }
 
-/**
-  Set the network link key
-**/
+/** Set the network link key **/
 export class NETWORK_LINK_KEY_SET {
-
     /**
     * @param link_key The network link key
     **/
     REQUEST(link_key: uint8_t_v16): void;
-
     /**
     * @param status Status value indicating success or the reason for failure
     **/
@@ -638,12 +495,9 @@ export class NETWORK_LINK_KEY_SET {
     NOTIFY(): void;
 }
 
-/**
-  Get the network security mode
-**/
+/** Get the network security mode **/
 export class NETWORK_SECURE_MODE_GET {
     REQUEST(): void;
-
     /**
     * @param secur_mode The network security mode
     **/
@@ -651,16 +505,12 @@ export class NETWORK_SECURE_MODE_GET {
     NOTIFY(): void;
 }
 
-/**
-  Set the network security mode
-**/
+/** Set the network security mode **/
 export class NETWORK_SECURE_MODE_SET {
-
     /**
     * @param secur_mode The network security mode
     **/
     REQUEST(secur_mode: esp_ncp_secur_t): void;
-
     /**
     * @param status Status value indicating success or the reason for failure
     **/
@@ -668,16 +518,12 @@ export class NETWORK_SECURE_MODE_SET {
     NOTIFY(): void;
 }
 
-/**
-  Enable or disable predefined network panid
-**/
+/** Enable or disable predefined network panid **/
 export class NETWORK_PREDEFINED_PANID {
-
     /**
     * @param secur_mode Enable od disable the network panid
     **/
     REQUEST(secur_mode: esp_ncp_secur_t): void;
-
     /**
     * @param status Status value indicating success or the reason for failure
     **/
@@ -685,16 +531,12 @@ export class NETWORK_PREDEFINED_PANID {
     NOTIFY(): void;
 }
 
-/**
-  Get the network IEEE address by the short address
-**/
+/** Get the network IEEE address by the short address **/
 export class NETWORK_SHORT_TO_IEEE {
-
     /**
     * @param short_addr The Zigbee device short address
     **/
     REQUEST(short_addr: uint16_t): void;
-
     /**
     * @param ieee_addr The Zigbee device long address
     **/
@@ -702,16 +544,12 @@ export class NETWORK_SHORT_TO_IEEE {
     NOTIFY(): void;
 }
 
-/**
-  Get the network short address by the IEEE address
-**/
+/** Get the network short address by the IEEE address **/
 export class NETWORK_IEEE_TO_SHORT {
-
     /**
     * @param ieee_addr The Zigbee device long address
     **/
     REQUEST(ieee_addr: uint8_t_v8): void;
-
     /**
     * @param short_addr The Zigbee device short address
     **/
@@ -719,11 +557,8 @@ export class NETWORK_IEEE_TO_SHORT {
     NOTIFY(): void;
 }
 
-/**
-  Configures endpoint information on the NCP
-**/
+/** Configures endpoint information on the NCP **/
 export class ZCL_ENDPOINT_ADD {
-
     /**
     * @param endpoint The application endpoint to be added
     * @param profileId The endpoint's application profile
@@ -735,7 +570,6 @@ export class ZCL_ENDPOINT_ADD {
     * @param outputClusterList Output cluster IDs the endpoint may send
     **/
     REQUEST(endpoint: uint8_t, profileId: uint16_t, deviceId: uint16_t, appFlags: uint8_t, inputClusterCount: uint8_t, outputClusterCount: uint8_t, inputClusterList: uint16_t_vec, outputClusterList: uint16_t_vec): void;
-
     /**
     * @param status Status value indicating success or the reason for failure
     **/
@@ -743,11 +577,8 @@ export class ZCL_ENDPOINT_ADD {
     NOTIFY(): void;
 }
 
-/**
-  Remove endpoint information on the NCP
-**/
+/** Remove endpoint information on the NCP **/
 export class ZCL_ENDPOINT_DEL {
-
     /**
     * @param endpoint The application endpoint to be added
     * @param profileId The endpoint's application profile
@@ -759,7 +590,6 @@ export class ZCL_ENDPOINT_DEL {
     * @param outputClusterList Output cluster IDs the endpoint may send
     **/
     REQUEST(endpoint: uint8_t, profileId: uint16_t, deviceId: uint16_t, appFlags: uint8_t, inputClusterCount: uint8_t, outputClusterCount: uint8_t, inputClusterList: uint16_t_vec, outputClusterList: uint16_t_vec): void;
-
     /**
     * @param status Status value indicating success or the reason for failure
     **/
@@ -767,11 +597,8 @@ export class ZCL_ENDPOINT_DEL {
     NOTIFY(): void;
 }
 
-/**
-  Read attribute data on NCP endpoints
-**/
+/** Read attribute data on NCP endpoints **/
 export class ZCL_ATTR_READ {
-
     /**
     * @param dst_addr The single short address or group address
     * @param dst_endpoint Destination Endpoint ID
@@ -782,12 +609,10 @@ export class ZCL_ATTR_READ {
     * @param attributeId Attribute ID
     **/
     REQUEST(dst_addr: uint8_t_v8, dst_endpoint: uint8_t, src_endpoint: uint8_t, address_mode: uint8_t, cluster: uint16_t, attr_number: uint8_t, attributeId: uint16_t_vec): void;
-
     /**
     * @param status Status value indicating success or the reason for failure
     **/
     RESPONSE(status: esp_ncp_status_t): void;
-
     /**
     * @param status Status
     * @param fc A 8-bit Frame control
@@ -814,11 +639,8 @@ export class ZCL_ATTR_READ {
     NOTIFY(status: uint8_t, fc: uint8_t, manuf_code: uint16_t, tsn: uint8_t, rssi: uint8_t, addr_type: uint8_t, device_addr: uint8_t_v8, dst_address: uint16_t, src_endpoint: uint8_t, dst_endpoint: uint8_t, cluster: uint16_t, profile: uint16_t, id: uint8_t, direction: uint8_t, is_common: uint8_t, attr_number: uint8_t, attr_status: uint8_t, attributeId: uint16_t, dataType: uint8_t, dataLength: uint8_t, data: uint8_t_vec): void;
 }
 
-/**
-  Write attribute data on NCP endpoints
-**/
+/** Write attribute data on NCP endpoints **/
 export class ZCL_ATTR_WRITE {
-
     /**
     * @param dst_addr The single short address or group address
     * @param dst_endpoint Destination Endpoint ID
@@ -832,12 +654,10 @@ export class ZCL_ATTR_WRITE {
     * @param data Attribute data
     **/
     REQUEST(dst_addr: uint8_t_v8, dst_endpoint: uint8_t, src_endpoint: uint8_t, address_mode: uint8_t, cluster: uint16_t, attr_number: uint8_t, attributeId: uint16_t, dataType: uint8_t, dataLength: uint8_t, data: uint8_t_vec): void;
-
     /**
     * @param status Status value indicating success or the reason for failure
     **/
     RESPONSE(status: esp_ncp_status_t): void;
-
     /**
     * @param status Status
     * @param fc A 8-bit Frame control
@@ -861,11 +681,8 @@ export class ZCL_ATTR_WRITE {
     NOTIFY(status: uint8_t, fc: uint8_t, manuf_code: uint16_t, tsn: uint8_t, rssi: uint8_t, addr_type: uint8_t, device_addr: uint8_t_v8, dst_address: uint16_t, src_endpoint: uint8_t, dst_endpoint: uint8_t, cluster: uint16_t, profile: uint16_t, id: uint8_t, direction: uint8_t, is_common: uint8_t, attr_number: uint8_t, attr_status: uint8_t, attributeId: uint16_t): void;
 }
 
-/**
-  Report attribute data on NCP endpoints
-**/
+/** Report attribute data on NCP endpoints **/
 export class ZCL_ATTR_REPORT {
-
     /**
     * @param dst_addr The single short address or group address
     * @param dst_endpoint Destination Endpoint ID
@@ -876,12 +693,10 @@ export class ZCL_ATTR_REPORT {
     * @param attributeID Attribute ID to report
     **/
     REQUEST(dst_addr: uint8_t_v8, dst_endpoint: uint8_t, src_endpoint: uint8_t, address_mode: uint8_t, clusterID: uint16_t, cluster_role: uint8_t, attributeID: uint16_t): void;
-
     /**
     * @param status Status value indicating success or the reason for failure
     **/
     RESPONSE(status: esp_ncp_status_t): void;
-
     /**
     * @param status Status
     * @param addr_type address type see esp_zb_zcl_address_type_t
@@ -898,11 +713,8 @@ export class ZCL_ATTR_REPORT {
     NOTIFY(status: uint8_t, addr_type: uint8_t, device_addr: uint8_t_v8, src_endpoint: uint8_t, dst_endpoint: uint8_t, cluster: uint16_t, attr_number: uint8_t, id: uint16_t, type: uint8_t, size: uint8_t, data: uint8_t_vec): void;
 }
 
-/**
-  Discover attribute data on NCP endpoints
-**/
+/** Discover attribute data on NCP endpoints **/
 export class ZCL_ATTR_DISC {
-
     /**
     * @param dst_addr The single short address or group address
     * @param dst_endpoint Destination Endpoint ID
@@ -914,12 +726,10 @@ export class ZCL_ATTR_DISC {
     * @param direction The command direction
     **/
     REQUEST(dst_addr: uint8_t_v8, dst_endpoint: uint8_t, src_endpoint: uint8_t, address_mode: uint8_t, cluster_id: uint16_t, start_attr_id: uint16_t, max_attr_number: uint8_t, direction: uint8_t): void;
-
     /**
     * @param status Status value indicating success or the reason for failure
     **/
     RESPONSE(status: esp_ncp_status_t): void;
-
     /**
     * @param status Status
     * @param fc A 8-bit Frame control
@@ -943,11 +753,8 @@ export class ZCL_ATTR_DISC {
     NOTIFY(status: uint8_t, fc: uint8_t, manuf_code: uint16_t, tsn: uint8_t, rssi: uint8_t, addr_type: uint8_t, device_addr: uint8_t_v8, dst_address: uint16_t, src_endpoint: uint8_t, dst_endpoint: uint8_t, cluster: uint16_t, profile: uint16_t, id: uint8_t, direction: uint8_t, is_common: uint8_t, attr_number: uint8_t, id2: uint16_t, type: uint8_t): void;
 }
 
-/**
-  Write APS on NCP endpoints
-**/
+/** Write APS on NCP endpoints **/
 export class ZCL_WRITE {
-
     /**
     * @param dst_addr The single short address or group address
     * @param dst_endpoint Destination Endpoint ID
@@ -962,7 +769,6 @@ export class ZCL_WRITE {
     * @param data Command data
     **/
     REQUEST(dst_addr: uint8_t_v8, dst_endpoint: uint8_t, src_endpoint: uint8_t, address_mode: uint8_t, profile_id: uint16_t, cluster_id: uint16_t, cmd_id: uint16_t, direction: uint8_t, dataType: uint8_t, dataLength: uint8_t, data: uint8_t_vec): void;
-
     /**
     * @param status Status value indicating success or the reason for failure
     **/
@@ -970,11 +776,8 @@ export class ZCL_WRITE {
     NOTIFY(): void;
 }
 
-/**
-  Report configure on NCP endpoints
-**/
+/** Report configure on NCP endpoints **/
 export class ZCL_REPORT_CONFIG {
-
     /**
     * @param dst_addr The single short address or group address
     * @param dst_endpoint Destination Endpoint ID
@@ -989,12 +792,10 @@ export class ZCL_REPORT_CONFIG {
     * @param max_interval Maximum reporting interval
     **/
     REQUEST(dst_addr: uint8_t_v8, dst_endpoint: uint8_t, src_endpoint: uint8_t, address_mode: uint8_t, cluster_id: uint16_t, record_number: uint16_t, direction: uint8_t, attributeID: uint16_t, attrType: uint8_t, min_interval: uint16_t, max_interval: uint16_t): void;
-
     /**
     * @param status Status value indicating success or the reason for failure
     **/
     RESPONSE(status: esp_ncp_status_t): void;
-
     /**
     * @param status Status
     * @param fc A 8-bit Frame control
@@ -1019,11 +820,8 @@ export class ZCL_REPORT_CONFIG {
     NOTIFY(status: uint8_t, fc: uint8_t, manuf_code: uint16_t, tsn: uint8_t, rssi: uint8_t, addr_type: uint8_t, device_addr: uint8_t_v8, dst_address: uint16_t, src_endpoint: uint8_t, dst_endpoint: uint8_t, cluster: uint16_t, profile: uint16_t, id: uint8_t, direction: uint8_t, is_common: uint8_t, attr_number: uint8_t, attr_status: uint8_t, direction2: uint8_t, attributeId: uint16_t): void;
 }
 
-/**
-  Create a binding between two endpoints on two nodes
-**/
+/** Create a binding between two endpoints on two nodes **/
 export class ZDO_BIND_SET {
-
     /**
     * @param src_address The IEEE address for the source
     * @param src_endp The source endpoint for the binding entry
@@ -1036,12 +834,10 @@ export class ZDO_BIND_SET {
     * @param user_ctx User information context
     **/
     REQUEST(src_address: uint8_t_v8, src_endp: uint8_t, cluster_id: uint16_t, dst_addr_mode: uint8_t, addr_short_long: uint8_t_v8, dst_endp: uint8_t, req_dst_addr: uint16_t, user_cb: uint32_t, user_ctx: uint32_t): void;
-
     /**
     * @param status Status value indicating success or the reason for failure
     **/
     RESPONSE(status: esp_ncp_status_t): void;
-
     /**
     * @param zdo_status Status value indicating success or the reason for failur
     * @param user_cb A ZDO match desc request callback
@@ -1050,11 +846,8 @@ export class ZDO_BIND_SET {
     NOTIFY(zdo_status: uint8_t, user_cb: uint32_t, user_ctx: uint32_t): void;
 }
 
-/**
-  Remove a binding between two endpoints on two nodes
-**/
+/** Remove a binding between two endpoints on two nodes **/
 export class ZDO_UNBIND_SET {
-
     /**
     * @param src_address The IEEE address for the source
     * @param src_endp The source endpoint for the binding entry
@@ -1067,12 +860,10 @@ export class ZDO_UNBIND_SET {
     * @param user_ctx User information context
     **/
     REQUEST(src_address: uint8_t_v8, src_endp: uint8_t, cluster_id: uint16_t, dst_addr_mode: uint8_t, addr_short_long: uint8_t_v8, dst_endp: uint8_t, req_dst_addr: uint16_t, user_cb: uint32_t, user_ctx: uint32_t): void;
-
     /**
     * @param status Status value indicating success or the reason for failure
     **/
     RESPONSE(status: esp_ncp_status_t): void;
-
     /**
     * @param zdo_status Status value indicating success or the reason for failur
     * @param user_cb A ZDO match desc request callback
@@ -1081,11 +872,8 @@ export class ZDO_UNBIND_SET {
     NOTIFY(zdo_status: uint8_t, user_cb: uint32_t, user_ctx: uint32_t): void;
 }
 
-/**
-  Send match desc request to find matched Zigbee device
-**/
+/** Send match desc request to find matched Zigbee device **/
 export class ZDO_FIND_MATCH {
-
     /**
     * @param user_cb A ZDO match desc request callback
     * @param user_ctx User information context
@@ -1097,12 +885,10 @@ export class ZDO_FIND_MATCH {
     * @param cluster_list The cluster ID with size num_in_clusters + num_out_cluster
     **/
     REQUEST(user_cb: uint32_t, user_ctx: uint32_t, dst_nwk_addr: uint16_t, addr_of_interest: uint16_t, profile_id: uint16_t, num_in_clusters: uint8_t, num_out_clusters: uint8_t, cluster_list: uint16_t_vec): void;
-
     /**
     * @param status Status value indicating success or the reason for failure
     **/
     RESPONSE(status: esp_ncp_status_t): void;
-
     /**
     * @param zdo_status The ZDO response status
     * @param addr A short address of the device response
@@ -1113,11 +899,8 @@ export class ZDO_FIND_MATCH {
     NOTIFY(zdo_status: uint8_t, addr: uint16_t, endpoint: uint8_t, user_cb: uint32_t, user_ctx: uint32_t): void;
 }
 
-/**
-  Request the aps data
-**/
+/** Request the aps data **/
 export class APS_DATA_REQUEST {
-
     /**
     * @param dst_address The IEEE address for the source
     * @param dst_endpoint The number of the individual endpoint
@@ -1134,7 +917,6 @@ export class APS_DATA_REQUEST {
     * @param asdu The set of octets comprising the ASDU to be transferred
     **/
     REQUEST(dst_address: uint8_t_v8, dst_endpoint: uint8_t, src_endpoint: uint8_t, dst_addr_mode: uint8_t, profile_id: uint16_t, cluster_id: uint16_t, tx_options: uint8_t, use_alias: bool, alias_src_addr: uint8_t_v8, alias_seq_num: uint8_t, radius: uint8_t, asdu_length: uint32_t, asdu: uint8_t_vec): void;
-
     /**
     * @param status Status value indicating success or the reason for failure
     **/
@@ -1142,12 +924,9 @@ export class APS_DATA_REQUEST {
     NOTIFY(): void;
 }
 
-/**
-  Indication the aps data
-**/
+/** Indication the aps data **/
 export class APS_DATA_INDICATION {
     REQUEST(): void;
-
     /**
     * @param states The states of the device
     * @param dst_addr_mode The dest addr mode used in this primitive and of the APDU
@@ -1166,7 +945,6 @@ export class APS_DATA_INDICATION {
     * @param asdu The set of octets comprising the ASDU to be indicated
     **/
     RESPONSE(states: uint8_t, dst_addr_mode: uint8_t, dst_addr: uint8_t_v8, dst_endpoint: uint8_t, src_addr_mode: uint8_t, src_addr: uint8_t_v8, src_endpoint: uint8_t, profile_id: uint16_t, cluster_id: uint16_t, indication_status: uint8_t, security_status: uint8_t, lqi: uint8_t, rx_time: uint32_t, asdu_length: uint32_t, asdu: uint8_t_vec): void;
-
     /**
     * @param states The states of the device
     * @param dst_addr_mode The dest addr mode used in this primitive and of the APDU
@@ -1187,12 +965,9 @@ export class APS_DATA_INDICATION {
     NOTIFY(states: uint8_t, dst_addr_mode: uint8_t, dst_addr: uint8_t_v8, dst_endpoint: uint8_t, src_addr_mode: uint8_t, src_addr: uint8_t_v8, src_endpoint: uint8_t, profile_id: uint16_t, cluster_id: uint16_t, indication_status: uint8_t, security_status: uint8_t, lqi: uint8_t, rx_time: uint32_t, asdu_length: uint32_t, asdu: uint8_t_vec): void;
 }
 
-/**
-  Confirm the aps data
-**/
+/** Confirm the aps data **/
 export class APS_DATA_CONFIRM {
     REQUEST(): void;
-
     /**
     * @param states The states of the device
     * @param dst_addr_mode The dest addr mode used in this primitive and of the APDU
@@ -1205,7 +980,6 @@ export class APS_DATA_CONFIRM {
     * @param asdu The set of octets comprising the ASDU to be confirm
     **/
     RESPONSE(states: uint8_t, dst_addr_mode: uint8_t, dst_address: uint8_t_v8, dst_endpoint: uint8_t, src_endpoint: uint8_t, tx_time: uint32_t, confirm_status: uint8_t, asdu_length: uint32_t, asdu: uint8_t_vec): void;
-
     /**
     * @param states The states of the device
     * @param dst_addr_mode The dest addr mode used in this primitive and of the APDU
