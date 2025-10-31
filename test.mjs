@@ -1,7 +1,8 @@
 import { SlipDecoder } from '@serialport/parser-slip-encoder'
-import test from 'node:test'
 import assert from 'node:assert/strict'
-import { parseFrame } from './ncpParsing.mjs'
+import test from 'node:test'
+import restructured from 'restructured'
+import { parseFrame, parseGridTable } from './ncpParsing.mjs'
 
 test('reference frames are correctly parsed', (t) => {
   const nwk_op = {
@@ -40,3 +41,32 @@ test('reference frames are correctly parsed', (t) => {
   }
 })
 
+test('can parse a simple RST grid', (t) => {
+  const input = `
++----------+---------------------------------+----------------+------------------------------------------------------------------------------------------+
+| Group ID | Frame Name                      | Frame ID       | Function                                                                                 |
++----------+---------------------------------+----------------+------------------------------------------------------------------------------------------+
+|  Network | NETWORK_INIT                    | 0x0000         | Resume network operation after a reboot                                                  |
++----------+---------------------------------+----------------+------------------------------------------------------------------------------------------+
+`
+  const parsed = restructured.default.parse(input).children[0]
+  assert.deepEqual(parseGridTable(parsed), [
+    ['Group ID', 'Frame Name', 'Frame ID', 'Function'],
+    ['Network', 'NETWORK_INIT', '0x0000', 'Resume network operation after a reboot']])
+  assert.deepEqual(parseGridTable(parsed, 1), [
+    ['Network', 'NETWORK_INIT', '0x0000', 'Resume network operation after a reboot']])
+})
+
+test('can parse a RST grid with merged cells', (t) => {
+  const input = `
++----------+---------------------------------+----------------+------------------------------------------------------------------------------------------+
+| Group ID | Frame Name                      | Frame ID       | Function                                                                                 |
++          +---------------------------------+----------------+------------------------------------------------------------------------------------------+
+|          | NETWORK_INIT                    | 0x0000         | Resume network operation after a reboot                                                  |
++----------+---------------------------------+----------------+------------------------------------------------------------------------------------------+
+`
+  const parsed = restructured.default.parse(input).children[0]
+  assert.deepEqual(parseGridTable(parsed), [
+    ['Group ID', 'Frame Name', 'Frame ID', 'Function'],
+    ['Group ID', 'NETWORK_INIT', '0x0000', 'Resume network operation after a reboot']])
+})

@@ -27,7 +27,7 @@ function findElements (node, predicate, collected = undefined) {
   return collected
 }
 
-function parseGridTable (paragraphNode, removeTopRows = 0) {
+export function parseGridTable (paragraphNode, removeTopRows = 0) {
   const lines = []
   for (const tNode of paragraphNode.children) {
     lines.push(tNode.value.trimEnd())
@@ -72,110 +72,121 @@ function parseGridTable (paragraphNode, removeTopRows = 0) {
   return values
 }
 
+function findSectionForFrame (rootNode, frameIdText) {
+  const predicate = createTitlePredicate((title) => title.endsWith(frameIdText))
+  const section = findElements(rootNode, predicate)
+  if (section.length > 0 && section[0].children.length > 2) {
+    return section[0].children[2]
+  }
+  return null
+}
+
+function parseArgTable (parsedTable, op) {
+  parsedTable = parsedTable.filter(r => r[1])
+  for (let i = 0; i < parsedTable.length; i++) {
+    const row = parsedTable[i]
+    if (!row[1].includes(':')) {
+      // this line doesn't have a type annotation. It might be the continuation of the previous line
+      if (i > 0) {
+        parsedTable[i - 1][1] += ' ' + row[1]
+      }
+    }
+  }
+  // parsedTable: [['Response Parameters:',  'esp_ncp_status_t status: Status value indicating success or the reason for failure'] ]
+  parsedTable = parsedTable.map(r => [r[0], ...r[1].split(':').map(s => s.trim())])
+  // NETWORK_PERMIT_JOINING has a weird doc with multiple ':' over multiple lines for the same param, patching it
+  /*[ 'Command Parameters:', 'uint8_t      duration', 'A value of 0x00 disables joining'],
+    [ 'Command Parameters:', '', 'A value of 0xFF enables joining' ],
+    [ 'Command Parameters:', '', 'Other value enables joining for that number of seconds' ]
+  */
+  const deleteIndices = new Set()
+  for (let i = parsedTable.length - 1; i > 0; i--) {
+    // go backwards to be able to collapse more than one row
+    const row = parsedTable[i]
+    if (row[1] === '') {
+      parsedTable[i - 1][2] += '. ' + row[2]
+      deleteIndices.add(i) // delete doesn't work in JS
+    }
+  }
+  parsedTable = parsedTable.filter((_, i) => !deleteIndices.has(i))
+  // parsedTable: [
+  //   ['Command Parameters:', 'None' ],
+  //   ['Response Parameters:', 'uint32_t role', 'The Zigbee device the 2.4G channel mask' ]]
+  parsedTable = parsedTable.filter(r => r.length > 2)
+  const splitTypeVariable = (str) => {
+    // NETWORK_FORM and NETWORK_JOIN have a field used for 2 purposes, it's documented as such:
+    // uint8_t max_children or ed_timeout
+    //str:  'uint8_t  max_children or ed_timeout'
+    // using \s+ because sometimes the type is separated by more than one space
+    let [type, ...vName] = str.split(/\s+/)
+    // type: uint8_t
+    // vName: [ 'max_children', 'or', 'ed_timeout']
+    vName = vName.join('_')
+    // APS_DATA_REQUEST.asdu is declared vith the brackets on the variable instead of type, fixing it
+    if (vName.endsWith('[]')) {
+      type = type + '[]'
+      vName = vName.slice(0, vName.length - 2)
+    }
+    // clean up the varaible names, some of them have punctuation in the name
+    vName = vName.replace(/[^A-Za-z0-9_]/g, '')
+    // remove brackets from typename to appease typescript
+    if (type.endsWith('[]')) {
+      type = type.substr(0, type.length - 2) + '_vec'
+    }
+    type = type.replace(/\[([0-9]+)]/, '_v$1')
+    return [vName, type]
+  }
+  parsedTable = parsedTable.map(r => [r[0], ...splitTypeVariable(r[1]), r[2]])
+  // parsedTable: [['Response Parameters:', 'role', 'uint32_t', 'The Zigbee device the 2.4G channel mask' ]]
+  const inputParams = parsedTable.filter(r => r[0].startsWith('Command ')).map(r => r.slice(1))
+  const outputParams = parsedTable.filter(r => r[0].startsWith('Response ')).map(r => r.slice(1))
+  const notifyParams = parsedTable.filter(r => r[0].startsWith('Notify ')).map(r => r.slice(1))
+
+  return {
+    id: parseInt(op[2]),
+    name: op[1],
+    description: op[3],
+    REQUEST: renameDuplicateParams(inputParams),
+    RESPONSE: renameDuplicateParams(outputParams),
+    NOTIFY: renameDuplicateParams(notifyParams)
+  }
+}
+
 export function parseNcpApi (rstText) {
   const parsed = restructured.default.parse(rstText)
   let frameTypeTableSection = findElements(parsed, isFrameIdList)[0]
   let operations = parseGridTable(frameTypeTableSection.children[1], 1)
-  const detailSection = parsed
   const documentedOperations = {}
   const undocumentedOperations = {}
   for (const op of operations) {
     // op: [ 'ZCL', 'ZCL_READ', '0x0106', 'Read APS on NCP endpoints' ]
-    const predicate = createTitlePredicate((title) => title.endsWith(op[1]))
-    const section = findElements(detailSection, predicate)
-    if (section.length > 0 && section[0].children.length > 2) {
-      let argTableSection = section[0].children[2]
-      let parsedTable = parseGridTable(argTableSection).filter(r => r[1])
-      for (let i = 0; i < parsedTable.length; i++) {
-        const row = parsedTable[i]
-        if (!row[1].includes(':')) {
-          // this line doesn't have a type annotation. It might be the continuation of the previous line
-          if (i > 0) {
-            parsedTable[i - 1][1] += ' ' + row[1]
-          }
-        }
-      }
-      // parsedTable: [['Response Parameters:',  'esp_ncp_status_t status: Status value indicating success or the reason for failure'] ]
-      parsedTable = parsedTable.map(r => [r[0], ...r[1].split(':').map(s => s.trim())])
-      // NETWORK_PERMIT_JOINING has a weird doc with multiple ':' over multiple lines for the same param, patching it
-      /*[ 'Command Parameters:', 'uint8_t      duration', 'A value of 0x00 disables joining'],
-        [ 'Command Parameters:', '', 'A value of 0xFF enables joining' ],
-        [ 'Command Parameters:', '', 'Other value enables joining for that number of seconds' ]
-      */
-      const deleteIndices = new Set()
-      for (let i = parsedTable.length - 1; i > 0; i--) {
-        // go backwards to be able to collapse more than one row
-        const row = parsedTable[i]
-        if (row[1] === '') {
-          parsedTable[i - 1][2] += '. ' + row[2]
-          deleteIndices.add(i) // delete doesn't work in JS
-        }
-      }
-      parsedTable = parsedTable.filter((_, i) => !deleteIndices.has(i))
-      // parsedTable: [
-      //   ['Command Parameters:', 'None' ],
-      //   ['Response Parameters:', 'uint32_t role', 'The Zigbee device the 2.4G channel mask' ]]
-      parsedTable = parsedTable.filter(r => r.length > 2)
-      const splitTypeVariable = (str) => {
-        // NETWORK_FORM and NETWORK_JOIN have a field used for 2 purposes, it's documented as such:
-        // uint8_t max_children or ed_timeout
-        //str:  'uint8_t  max_children or ed_timeout'
-        // using \s+ because sometimes the type is separated by more than one space
-        let [type, ...vName] = str.split(/\s+/)
-        // type: uint8_t
-        // vName: [ 'max_children', 'or', 'ed_timeout']
-        vName = vName.join('_')
-        // APS_DATA_REQUEST.asdu is declared vith the brackets on the variable instead of type, fixing it
-        if (vName.endsWith('[]')) {
-          type = type + '[]'
-          vName = vName.slice(0, vName.length - 2)
-        }
-        // clean up the varaible names, some of them have punctuation in the name
-        vName = vName.replace(/[^A-Za-z0-9_]/g, '')
-        // remove brackets from typename to appease typescript
-        if (type.endsWith('[]')) {
-          type = type.substr(0, type.length - 2) + '_vec'
-        }
-        type = type.replace(/\[([0-9]+)]/, '_v$1')
-        return [vName, type]
-      }
-      parsedTable = parsedTable.map(r => [r[0], ...splitTypeVariable(r[1]), r[2]])
-      // parsedTable: [['Response Parameters:', 'role', 'uint32_t', 'The Zigbee device the 2.4G channel mask' ]]
-      const inputParams = parsedTable.filter(r => r[0].startsWith('Command ')).map(r => r.slice(1))
-      const outputParams = parsedTable.filter(r => r[0].startsWith('Response ')).map(r => r.slice(1))
-      const notifyParams = parsedTable.filter(r => r[0].startsWith('Notify ')).map(r => r.slice(1))
-      documentedOperations[op[1]] = {
-        id: parseInt(op[2]),
-        name: op[1],
-        description: op[3],
-        REQUEST: renameDuplicateParams(inputParams),
-        RESPONSE: renameDuplicateParams(outputParams),
-        NOTIFY: renameDuplicateParams(notifyParams)
-      }
+    let argTableSection = findSectionForFrame(parsed, op[1])
+    if (argTableSection) {
+      let parsedTable = parseGridTable(argTableSection)
+      documentedOperations[op[1]] = parseArgTable(parsedTable, op)
     } else {
       undocumentedOperations[op[1]] = {id: parseInt(op[2]), name: op[1]}
       console.log(op[1], ':(')
     }
   }
-
-  function renameDuplicateParams (params) {
-    const paramNames = new Set()
-    for (const param of params) {
-      const origName = param[0]
-      let name = origName
-      let index = 2
-      while (paramNames.has(name)) {
-        name = origName + index
-        param[0] = name
-        index++
-      }
-      paramNames.add(name)
-    }
-    return params
-  }
-
   const id2op = new Map(Object.values(documentedOperations).map(v => [v.id, v]))
   return {documentedOperations, undocumentedOperations, id2op}
+}
+
+function renameDuplicateParams (params) {
+  const paramNames = new Set()
+  for (const param of params) {
+    const origName = param[0]
+    let name = origName
+    let index = 2
+    while (paramNames.has(name)) {
+      name = origName + index
+      param[0] = name
+      index++
+    }
+    paramNames.add(name)
+  }
+  return params
 }
 
 const HEADER_LEN = 7
@@ -183,20 +194,13 @@ const CSUM_LEN = 2
 
 const SIZEOF_MAP = {
   bool: 1, //taken from zigpy-espzb
-  uint8_t: 1,
-  esp_ncp_status_t: 1,
-  esp_ncp_secur_t: 1,
-  uint16_t: 2,
-  uint32_t: 4,
-  uint8_t_v8: 8,
-  uint8_t_v16: 16
+  uint8_t: 1, esp_ncp_status_t: 1, esp_ncp_secur_t: 1, uint16_t: 2, uint32_t: 4, uint8_t_v8: 8, uint8_t_v16: 16
 }
 
 function read_uint8_t_v (view, p, len) {
   const res = new Uint8Array(len)
   for (let i = 0; i < Math.min(len, view.byteLength - p); i++) {
-    let uint8 = view.getUint8(p + i)
-    res[i] = uint8
+    res[i] = view.getUint8(p + i)
   }
   return res
 }
@@ -218,8 +222,6 @@ const ACCESS_MAP = {
   uint8_t_v8: {set: write_uint8_t_v, get: (view, p) => read_uint8_t_v(view, p, 8)},
   uint8_t_v16: {set: write_uint8_t_v, get: (view, p) => read_uint8_t_v(view, p, 16)}
 }
-
-const FORMAT_MAP = {}
 
 function sizeof (apiType) {
   if (apiType in SIZEOF_MAP) {

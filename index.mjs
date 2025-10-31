@@ -20,19 +20,16 @@ const {
 
 const content = generateAPIFile(documentedOperations)
 await fs.writeFile('generated/NCP.d.ts', content, { encoding: 'utf8' })
-console.log('NETWORK_SCAN_COMPLETE_HANDLER', documentedOperations['NETWORK_SCAN_COMPLETE_HANDLER'])
+
 const allTypes = new Set()
-const allParamNames = new Set()
 for (const op of Object.values(documentedOperations)) {
   for (const direction of ['REQUEST', 'RESPONSE', 'NOTIFY']) {
     for (const param of op[direction]) {
       allTypes.add(param[1])
-      allParamNames.add(param[0])
     }
   }
 }
 console.log('all type: ', allTypes)
-console.log('all params: ', allParamNames)
 
 const uart = new SerialPort({path: SERIAL, baudRate: 115200})
 const encoder = new SlipEncoder({START: 0xc0})
