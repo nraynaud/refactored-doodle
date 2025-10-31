@@ -15,7 +15,7 @@
   "type": "module",
   "main": "index.mjs",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node test.mjs"
   },
   "dependencies": {
     "@athombv/data-types": "^1.1.4",
