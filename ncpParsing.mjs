@@ -81,7 +81,7 @@ function findSectionForFrame (rootNode, frameIdText) {
   return null
 }
 
-function parseArgTable (parsedTable, op) {
+export function parseArgTable (parsedTable, [opName, opId, opDesc]) {
   parsedTable = parsedTable.filter(r => r[1])
   for (let i = 0; i < parsedTable.length; i++) {
     const row = parsedTable[i]
@@ -127,11 +127,11 @@ function parseArgTable (parsedTable, op) {
       type = type + '[]'
       vName = vName.slice(0, vName.length - 2)
     }
-    // clean up the varaible names, some of them have punctuation in the name
+    // clean up the variable names, some of them have punctuation in the name
     vName = vName.replace(/[^A-Za-z0-9_]/g, '')
-    // remove brackets from typename to appease typescript
+    // remove brackets from typename to appease TypeScript
     if (type.endsWith('[]')) {
-      type = type.substr(0, type.length - 2) + '_vec'
+      type = type.substring(0, type.length - 2) + '_vec'
     }
     type = type.replace(/\[([0-9]+)]/, '_v$1')
     return [vName, type]
@@ -143,9 +143,9 @@ function parseArgTable (parsedTable, op) {
   const notifyParams = parsedTable.filter(r => r[0].startsWith('Notify ')).map(r => r.slice(1))
 
   return {
-    id: parseInt(op[2]),
-    name: op[1],
-    description: op[3],
+    id: parseInt(opId),
+    name: opName,
+    description: opDesc,
     REQUEST: renameDuplicateParams(inputParams),
     RESPONSE: renameDuplicateParams(outputParams),
     NOTIFY: renameDuplicateParams(notifyParams)
@@ -163,7 +163,7 @@ export function parseNcpApi (rstText) {
     let argTableSection = findSectionForFrame(parsed, op[1])
     if (argTableSection) {
       let parsedTable = parseGridTable(argTableSection)
-      documentedOperations[op[1]] = parseArgTable(parsedTable, op)
+      documentedOperations[op[1]] = parseArgTable(parsedTable, op.slice(1))
     } else {
       undocumentedOperations[op[1]] = {id: parseInt(op[2]), name: op[1]}
       console.log(op[1], ':(')
