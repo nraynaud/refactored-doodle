@@ -1,0 +1,27 @@
+{
+  "name": "refactored-doodle",
+  "version": "1.0.0",
+  "description": "",
+  "homepage": "https://github.com/nraynaud/refactored-doodle#readme",
+  "bugs": {
+    "url": "https://github.com/nraynaud/refactored-doodle/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nraynaud/refactored-doodle.git"
+  },
+  "license": "MIT",
+  "author": "",
+  "type": "module",
+  "main": "index.mjs",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@athombv/data-types": "^1.1.4",
+    "@serialport/parser-slip-encoder": "^13.0.0",
+    "modbus-crc16": "^1.0.0",
+    "restructured": "^0.0.11",
+    "serialport": "^13.0.0"
+  }
+}
